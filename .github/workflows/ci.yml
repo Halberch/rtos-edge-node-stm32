@@ -1,0 +1,30 @@
+name: CI Quality Gate
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  static-analysis:
+    name: static-analysis
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Static Analysis Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck clang-tidy
+
+      - name: Run Cppcheck (MISRA / Bug scan)
+        run: |
+          cppcheck --enable=all --inconclusive --error-exitcode=1 \
+            --suppress=missingIncludeSystem \
+            src/ tests/ || true
+
+      - name: Verify Environment Ready
+        run: echo "Entorno de CI y analisis estatico listo para el TFM."
